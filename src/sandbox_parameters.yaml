@@ -1,0 +1,6 @@
+sandbox_controller:
+  input_topic_name: {
+    type: string,
+    default_value: "/input",
+    description: "Name of the joystick topic"
+  }

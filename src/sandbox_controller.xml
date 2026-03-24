@@ -1,0 +1,9 @@
+<library path="sandbox_controller">
+  <class name="sandbox/SandboxController"
+         type="sandbox::SandboxController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      A template for a ros2 controller. Not to be used in current state.
+    </description>
+  </class>
+</library>
