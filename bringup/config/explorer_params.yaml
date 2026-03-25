@@ -57,6 +57,7 @@ sandbox_controller:
   ros__parameters:
     robot_type: "explorer_velocity"
     tool_frame: "tool0"
+    input_topic_name: "/teleop_cmd"
     command_names:
       - "qontrol_explorer/linear_x"
       - "qontrol_explorer/linear_y"
