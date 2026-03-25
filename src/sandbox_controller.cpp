@@ -107,8 +107,8 @@ namespace sandbox
   {
     auto node = get_node();
 
-    setupSubscribers();
     loadParameters();
+    setupSubscribers();
     setupPublishers();
 
     // Create robot interface
