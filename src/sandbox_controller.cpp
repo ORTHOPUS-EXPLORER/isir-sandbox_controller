@@ -144,6 +144,13 @@ namespace sandbox
     // Write above this, and put computed velocity inside latest_vel_cmd
     // latest_vel_cmd.linear = ...
     // latest_vel_cmd.angular = ...
+    latest_vel_cmd.linear[0] = latest_teleop_cmd.linear.x;
+    latest_vel_cmd.linear[1] = latest_teleop_cmd.linear.y;
+    latest_vel_cmd.linear[2] = latest_teleop_cmd.linear.z;
+    latest_vel_cmd.angular[0] = latest_teleop_cmd.angular.x;
+    latest_vel_cmd.angular[1] = latest_teleop_cmd.angular.y;
+    latest_vel_cmd.angular[2] = latest_teleop_cmd.angular.z;
+
     publishInfo();
     if (robot_interface_->setCommand(latest_vel_cmd))
     {
