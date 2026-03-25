@@ -31,16 +31,15 @@ namespace sandbox
 
   CallbackReturn SandboxController::on_init()
   {
-    setupSubscribers();
     param_listener_ = std::make_shared<sandbox_controller::ParamListener>(get_node());
-
 
     return CallbackReturn::SUCCESS;
   }
 
   void SandboxController::loadParameters()
   {
-    // These 3 parameters are mandatory, but others can be added in the same fashion
+    // These 3 parameters are mandatory, but others can be added in the same
+    // fashion
     declare_and_get_parameters("robot_type", robot_type_, std::string("explorer_velocity"));
     declare_and_get_parameters("command_names", command_names_, std::vector<std::string>{});
     declare_and_get_parameters("base_frame", base_frame_, std::string("base_link"));
@@ -91,10 +90,9 @@ namespace sandbox
     }
 
     robot_interface_ = robot_interfaces::create_robot_component(robot_type_);
-    if (!robot_interface_ ||
-        !robot_interface_->initKinematics(robot_description,
-                                              node->get_parameter("base_frame").as_string(),
-                                              node->get_parameter("tool_frame").as_string()))
+    if (!robot_interface_ || !robot_interface_->initKinematics(
+                                 robot_description, node->get_parameter("base_frame").as_string(),
+                                 node->get_parameter("tool_frame").as_string()))
     {
       RCLCPP_ERROR(node->get_logger(), "Failed to initialize robot interface.");
       return false;
@@ -109,6 +107,7 @@ namespace sandbox
   {
     auto node = get_node();
 
+    setupSubscribers();
     loadParameters();
     setupPublishers();
 
@@ -160,8 +159,7 @@ namespace sandbox
   void SandboxController::publishInfo()
   {
     // Publish operational pose
-    robot_interfaces::CartesianPosition temp_pose =
-        robot_interface_->getCurrentEndEffectorPose();
+    robot_interfaces::CartesianPosition temp_pose = robot_interface_->getCurrentEndEffectorPose();
 
     geometry_msgs::msg::PoseStamped pose_to_pub;
 
