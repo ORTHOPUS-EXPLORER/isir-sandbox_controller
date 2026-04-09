@@ -139,6 +139,7 @@ def generate_launch_description():
         output="screen",
     )
 
+    '''
     # Spawner for fault_controller
     fault_controller_spawner = Node(
         package="controller_manager",
@@ -146,6 +147,7 @@ def generate_launch_description():
         arguments=["fault_controller", "-c", "/controller_manager"],
         output="screen",
     )
+    '''
 
 
     # --------------------------------------------------------------------------
@@ -162,7 +164,7 @@ def generate_launch_description():
     start_sandbox_event = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawner_qontrol,
-            on_exit=[ spawner_sandbox_controller, gripper_controller_spawner, fault_controller_spawner]
+            on_exit=[ spawner_sandbox_controller, gripper_controller_spawner] #, fault_controller_spawner]
         )
     )
 
