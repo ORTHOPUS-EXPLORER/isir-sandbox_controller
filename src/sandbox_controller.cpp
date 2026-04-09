@@ -150,6 +150,7 @@ namespace sandbox
     latest_vel_cmd.angular[0] = latest_teleop_cmd.angular.x;
     latest_vel_cmd.angular[1] = latest_teleop_cmd.angular.y;
     latest_vel_cmd.angular[2] = latest_teleop_cmd.angular.z;
+    RCLCPP_INFO(get_node()->get_logger(), "teleop_cmd : '%f', '%f', '%f'", latest_teleop_cmd.linear.x, latest_teleop_cmd.linear.y, latest_teleop_cmd.linear.z);
 
     publishInfo();
     if (robot_interface_->setCommand(latest_vel_cmd))
