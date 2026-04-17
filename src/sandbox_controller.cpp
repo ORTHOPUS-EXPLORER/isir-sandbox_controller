@@ -91,8 +91,7 @@ namespace sandbox
 
     robot_interface_ = robot_interfaces::create_robot_component(robot_type_);
     if (!robot_interface_ || !robot_interface_->initKinematics(
-                                 robot_description, node->get_parameter("base_frame").as_string(),
-                                 node->get_parameter("tool_frame").as_string()))
+                                 robot_description, node->get_parameter("tool_frame").as_string()))
     {
       RCLCPP_ERROR(node->get_logger(), "Failed to initialize robot interface.");
       return false;
@@ -141,6 +140,7 @@ namespace sandbox
   controller_interface::return_type SandboxController::update(const rclcpp::Time &time,
                                                               const rclcpp::Duration &period)
   {
+    robot_interface_->syncState();
     // Write above this, and put computed velocity inside latest_vel_cmd
     // latest_vel_cmd.linear = ...
     // latest_vel_cmd.angular = ...
@@ -150,7 +150,8 @@ namespace sandbox
     latest_vel_cmd.angular[0] = latest_teleop_cmd.angular.x;
     latest_vel_cmd.angular[1] = latest_teleop_cmd.angular.y;
     latest_vel_cmd.angular[2] = latest_teleop_cmd.angular.z;
-    RCLCPP_INFO(get_node()->get_logger(), "teleop_cmd : '%f', '%f', '%f'", latest_teleop_cmd.linear.x, latest_teleop_cmd.linear.y, latest_teleop_cmd.linear.z);
+    RCLCPP_INFO(get_node()->get_logger(), "teleop_cmd : '%f', '%f', '%f'",
+                latest_teleop_cmd.linear.x, latest_teleop_cmd.linear.y, latest_teleop_cmd.linear.z);
 
     publishInfo();
     if (robot_interface_->setCommand(latest_vel_cmd))
