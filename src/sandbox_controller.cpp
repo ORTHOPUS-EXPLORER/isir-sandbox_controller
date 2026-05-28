@@ -150,8 +150,6 @@ namespace sandbox
     latest_vel_cmd.angular[0] = latest_teleop_cmd.angular.x;
     latest_vel_cmd.angular[1] = latest_teleop_cmd.angular.y;
     latest_vel_cmd.angular[2] = latest_teleop_cmd.angular.z;
-    RCLCPP_INFO(get_node()->get_logger(), "teleop_cmd : '%f', '%f', '%f'",
-                latest_teleop_cmd.linear.x, latest_teleop_cmd.linear.y, latest_teleop_cmd.linear.z);
 
     publishInfo();
     if (robot_interface_->setCommand(latest_vel_cmd))
@@ -186,11 +184,11 @@ namespace sandbox
     op_pose_pub->publish(pose_to_pub);
 
     // Publish joint pose
-    robot_interfaces::JointCommand temp_joint_pose = robot_interface_->getCurrentJointPose();
+    const auto &joint_positions = robot_interface_->getJointPositions();
     std_msgs::msg::Float64MultiArray joint_pose_to_pub;
-    for (const double c : temp_joint_pose.command)
+    for (const double joint_position : joint_positions)
     {
-      joint_pose_to_pub.data.push_back(c);
+      joint_pose_to_pub.data.push_back(joint_position);
     }
     joint_pose_pub->publish(joint_pose_to_pub);
 
