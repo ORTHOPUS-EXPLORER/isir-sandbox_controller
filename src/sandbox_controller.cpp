@@ -81,9 +81,9 @@ namespace sandbox
   bool SandboxController::setupRobotInterface()
   {
     auto node = get_node();
-    std::string robot_description;
+    const auto &robot_description = get_robot_description();
 
-    if (!node->get_parameter("robot_description", robot_description))
+    if (robot_description.empty())
     {
       RCLCPP_ERROR(node->get_logger(), "Missing robot_description");
       return false;
