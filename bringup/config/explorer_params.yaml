@@ -4,16 +4,15 @@ controller_manager:
 
     qontrol_explorer:
       type: qontrol_controller/QontrolVelocityController
-      auto_start: false
-      is_chainable: true
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
 
     sandbox_controller:
       type: sandbox/SandboxController
-      auto_start: false
 
     gripper_controller:
       type: forward_command_controller/ForwardCommandController
-      auto_start: false
 
 qontrol_explorer:
   ros__parameters:
