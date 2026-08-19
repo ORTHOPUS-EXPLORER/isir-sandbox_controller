@@ -138,8 +138,8 @@ namespace sandbox
     return CallbackReturn::SUCCESS;
   }
 
-  controller_interface::return_type SandboxController::update(const rclcpp::Time &time,
-                                                              const rclcpp::Duration &period)
+  controller_interface::return_type SandboxController::update(const rclcpp::Time &,
+                                                              const rclcpp::Duration &)
   {
     robot_interface_->syncState();
     // Write above this, and put computed velocity inside latest_vel_cmd
