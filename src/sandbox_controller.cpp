@@ -38,11 +38,12 @@ namespace sandbox
 
   void SandboxController::loadParameters()
   {
-    // These 3 parameters are mandatory, but others can be added in the same
+    // These 4 parameters are mandatory, but others can be added in the same
     // fashion
     declare_and_get_parameters("robot_type", robot_type_, std::string("explorer_velocity"));
     declare_and_get_parameters("command_names", command_names_, std::vector<std::string>{});
     declare_and_get_parameters("base_frame", base_frame_, std::string("base_link"));
+    declare_and_get_parameters("tool_frame", tool_frame_, std::string("tool0"));
 
     params_ = param_listener_->get_params();
   }
@@ -91,7 +92,7 @@ namespace sandbox
 
     robot_interface_ = robot_interfaces::create_robot_component(robot_type_);
     if (!robot_interface_ || !robot_interface_->initKinematics(
-                                 robot_description, node->get_parameter("tool_frame").as_string()))
+                                 robot_description, tool_frame_))
     {
       RCLCPP_ERROR(node->get_logger(), "Failed to initialize robot interface.");
       return false;

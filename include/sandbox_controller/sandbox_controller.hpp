@@ -76,6 +76,7 @@ namespace sandbox
     std::string robot_type_{"explorer_velocity"};
     std::vector<std::string> command_names_;
     std::string base_frame_;
+    std::string tool_frame_;
     std::unique_ptr<robot_interfaces::GenericComponent> robot_interface_;
 
     geometry_msgs::msg::Twist latest_teleop_cmd;
