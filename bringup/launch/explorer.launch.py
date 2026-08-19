@@ -1,83 +1,51 @@
+from explorer_bringup.launch.controller_manager_spawner import (
+    declare_node_gripper_controller_spawner,
+    declare_node_qcontrol_controller_spawner,
+)
+from explorer_bringup.launch.hardware import (
+    declare_hardware_node_group,
+)
+from explorer_bringup.launch.hardware_parameters import declare_hardware_argument_list
+from explorer_bringup.launch.simulation import (
+    declare_simulation_node_group,
+)
+from explorer_bringup.launch.simulation_parameters import (
+    declare_simulation_argument_list,
+)
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument,IncludeLaunchDescription, RegisterEventHandler, TimerAction
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
-from launch.conditions import IfCondition, UnlessCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PythonExpression
 
 
 def generate_launch_description():
+    robot_controller_config = "explorer_params"
+    robot_controller_config_path = "sandbox_controller"
+
     # --------------------------------------------------------------------------
     # Configuration & Arguments
     # --------------------------------------------------------------------------
-    gui = LaunchConfiguration("gui")
-    use_simulation = LaunchConfiguration("use_simulation")
-
-    use_actuator_interface = PythonExpression([
-            "'false' if '", use_simulation, "' == 'true' else 'true'"
-        ])
     declared_arguments = [
+        ## Override subsequent arg declaration by setting it to true by default
         DeclareLaunchArgument(
-            "gui", 
-            default_value="true", 
-            description="Start RViz2 automatically with this launch file."
+            "use_qp_inria",
+            default_value="true",
+            description="Use QP solver from Inria",
         ),
-        DeclareLaunchArgument(
-            "use_simulation", 
-            default_value="false", 
-            description="Whether to launch the Gazebo simulation environment"
+        *declare_simulation_argument_list(
+            robot_controller_config=robot_controller_config,
+            robot_controller_config_path=robot_controller_config_path,
+        ),
+        *declare_hardware_argument_list(
+            robot_controller_config=robot_controller_config,
+            robot_controller_config_path=robot_controller_config_path,
         ),
     ]
 
     # --------------------------------------------------------------------------
-    # File Paths & Substitutions
-    # --------------------------------------------------------------------------
-    # Config Files   
-    velocity_config = PathJoinSubstitution([
-        FindPackageShare("sandbox_controller"), "config", "explorer_params.yaml"
-    ])
-
-    robot_simulation = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([FindPackageShare("explorer_bringup"), "/launch/simulation_base.launch.py"]),
-        launch_arguments={
-            'use_POC2': "true",
-            'gui': gui,
-            'use_sim_time': use_simulation,
-            'rviz_delay': '3.0',
-            'extra_controllers_config': velocity_config, 
-            'use_custom_controllers': "true"
-        }.items(),
-        condition=IfCondition(use_simulation)
-    )
-
-    robot_hardware = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([FindPackageShare("explorer_bringup"), "/launch/hardware_base.launch.py"]),
-        launch_arguments={
-            'gui': gui,
-            'use_sim_time': use_simulation,
-            'use_actuator_interface': use_actuator_interface,
-            'can_port': "can0",
-            'host_id': "45",
-            'use_POC2': "true",
-            'rviz_delay': '3.0', 
-            'extra_controllers_config': velocity_config,
-            'use_custom_controllers': "true"
-
-        }.items(),
-        condition=UnlessCondition(use_simulation) 
-    )
-
-    # --------------------------------------------------------------------------
     # Controllers spawner
     # --------------------------------------------------------------------------
-    spawner_qontrol = Node(
-        package="controller_manager", 
-        executable="spawner",
-        arguments=["qontrol_explorer", "--controller-manager", "/controller_manager"],
-    )
+    spawner_qontrol = declare_node_qcontrol_controller_spawner()
 
     spawner_sandbox_controller = Node(
         package="controller_manager",
@@ -86,29 +54,33 @@ def generate_launch_description():
         output="screen",
     )
 
-    spawner_gripper_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["gripper_controller", "--controller-manager", "/controller_manager"],
-        output="screen",
+    spawner_gripper_controller = declare_node_gripper_controller_spawner()
+
+    robot_controller_list = [
+        spawner_gripper_controller,
+        spawner_qontrol,
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=spawner_qontrol,
+                on_exit=[spawner_sandbox_controller],
+            )
+        ),
+    ]
+    # --------------------------------------------------------------------------
+    # File Paths & Substitutions
+    # --------------------------------------------------------------------------
+    # Config Files
+
+    robot_simulation = declare_simulation_node_group(
+        robot_controller_list=robot_controller_list,
+        launch_qp_solving=False,
     )
 
-    # --------------------------------------------------------------------------
-    # Other Nodes
-    # --------------------------------------------------------------------------
-    
-    # --------------------------------------------------------------------------
-    # Event Handlers
-    # --------------------------------------------------------------------------
-    delayed_spawner_qontrol = TimerAction(
-        period=2.0,
-        actions=[spawner_qontrol]
-    )
-    start_sandbox_event = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=spawner_qontrol,
-            on_exit=[ spawner_sandbox_controller, spawner_gripper_controller]
-        )
+    robot_hardware = declare_hardware_node_group(
+        robot_controller_list=robot_controller_list,
+        launch_qp_solving=False,
+        robot_controller_config_file=robot_controller_config,
+        robot_controller_config_path=robot_controller_config_path,
     )
 
     # --------------------------------------------------------------------------
@@ -117,8 +89,6 @@ def generate_launch_description():
     nodes_to_start = [
         robot_simulation,
         robot_hardware,
-        delayed_spawner_qontrol,
-        start_sandbox_event,
     ]
 
     return LaunchDescription(declared_arguments + nodes_to_start)
