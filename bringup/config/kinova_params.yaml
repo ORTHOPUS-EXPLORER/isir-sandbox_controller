@@ -31,6 +31,7 @@ qontrol_explorer:
       - velocity
       - effort
     robot_command: position
+    reference_interface_name: velocity
 
     # Velocity parameters
     command_max_linear_velocity: 0.05
@@ -70,9 +71,9 @@ sandbox_controller:
     tool_frame: "end_effector_link"
     input_topic_name: "/teleop_cmd"
     command_names:
-      - "qontrol_explorer/linear_x"
-      - "qontrol_explorer/linear_y"
-      - "qontrol_explorer/linear_z"
-      - "qontrol_explorer/angular_x"
-      - "qontrol_explorer/angular_y"
-      - "qontrol_explorer/angular_z"
+      - "qontrol_explorer/velocity/linear_x"
+      - "qontrol_explorer/velocity/linear_y"
+      - "qontrol_explorer/velocity/linear_z"
+      - "qontrol_explorer/velocity/angular_x"
+      - "qontrol_explorer/velocity/angular_y"
+      - "qontrol_explorer/velocity/angular_z"
