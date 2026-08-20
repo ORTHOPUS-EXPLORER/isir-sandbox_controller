@@ -2,6 +2,9 @@ controller_manager:
   ros__parameters:
     update_rate: 250  # Hz
 
+    explorer_custom_controller:
+      type: explorer_command_controllers/CustomController
+
     qontrol_explorer:
       type: qontrol_controller/QontrolVelocityController
 
@@ -24,7 +27,9 @@ qontrol_explorer:
       - position
       - velocity
       - effort
-    robot_command: position
+  
+    chainable_controller_name: explorer_custom_controller
+    robot_command: qp_position
     reference_interface_name: velocity
 
     # Velocity parameters
@@ -66,3 +71,80 @@ sandbox_controller:
       - "qontrol_explorer/velocity/angular_x"
       - "qontrol_explorer/velocity/angular_y"
       - "qontrol_explorer/velocity/angular_z"
+
+explorer_custom_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+    settings:
+      joint_1: { 
+        mode: "position",
+        command_interface_names: ["effort", "position", "velocity"],
+        state_interface_names: ["effort", "position", "velocity"],
+        impedance_damping: 1.0,
+        impedance_stiffness: 2.0,
+        enable_limits: false,
+        position_command_min: -0.2,
+        position_command_max:  0.2,
+        position_step_max: 0.0005,
+      }
+      joint_2: {
+        mode: "position",
+        command_interface_names: ["effort", "position", "velocity"],
+        state_interface_names: ["effort", "position", "velocity"],
+        impedance_damping: 1.5,
+        impedance_stiffness: 2.5,
+        enable_limits: false,
+        position_command_min: -1.57,
+        position_command_max: -0.78,
+        position_step_max: 0.0005,
+      }
+      joint_3: {
+        mode: "position",
+        command_interface_names: ["effort", "position", "velocity"],
+        state_interface_names: ["effort", "position", "velocity"],
+        impedance_damping: 1.0,
+        impedance_stiffness: 2.0,
+        enable_limits: false,
+        position_command_min: -0.78,
+        position_command_max:  0.78,
+        position_step_max: 0.0005,
+      }
+      joint_4: {
+        mode: "position",
+        command_interface_names: ["effort", "position", "velocity"],
+        state_interface_names: ["effort", "position", "velocity"],
+        impedance_damping: 0.5,
+        impedance_stiffness: 1.0,
+        enable_limits: false,
+        position_command_min: -1.0,
+        position_command_max:  1.0,
+        position_step_max: 0.2,
+      }
+      joint_5: {
+        mode: "position",
+        command_interface_names: ["effort", "position", "velocity"],
+        state_interface_names: ["effort", "position", "velocity"],
+        impedance_damping: 0.7,
+        impedance_stiffness: 0.8,
+        enable_limits: false,
+        position_command_min: -1.0,
+        position_command_max:  1.0,
+        position_step_max: 0.2,
+      }
+      joint_6: {
+        mode: "position",
+        command_interface_names: ["effort", "position", "velocity"],
+        state_interface_names: ["effort", "position", "velocity"],
+        impedance_damping: 0.2,
+        impedance_stiffness: 0.3,
+        enable_limits: false,
+        position_command_min: -1.0,
+        position_command_max:  1.0,
+        position_step_max: 0.2,
+      }

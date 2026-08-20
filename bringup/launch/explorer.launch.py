@@ -1,4 +1,5 @@
 from explorer_bringup.launch.controller_manager_spawner import (
+    declare_custom_controller_spawner,
     declare_node_gripper_controller_spawner,
     declare_node_qcontrol_controller_spawner,
 )
@@ -13,7 +14,7 @@ from explorer_bringup.launch.simulation_parameters import (
     declare_simulation_argument_list,
 )
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 
@@ -45,6 +46,11 @@ def generate_launch_description():
     # --------------------------------------------------------------------------
     # Controllers spawner
     # --------------------------------------------------------------------------
+    spawner_custom_controller = declare_custom_controller_spawner(
+        robot_controller_config=robot_controller_config,
+        robot_controller_config_path=robot_controller_config_path
+    )
+
     spawner_qontrol = declare_node_qcontrol_controller_spawner()
 
     spawner_sandbox_controller = Node(
@@ -57,8 +63,9 @@ def generate_launch_description():
     spawner_gripper_controller = declare_node_gripper_controller_spawner()
 
     robot_controller_list = [
+        *spawner_custom_controller,
         spawner_gripper_controller,
-        spawner_qontrol,
+        TimerAction(period=2.5,actions=[spawner_qontrol]),
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=spawner_qontrol,
